@@ -21,27 +21,60 @@ def get_teams(player_name):
         #rows = cursor.execute(f"select team_name from team where team_id='{1}'")
 
     rows = list(rows)
-    print(rows)
-   # rows = [ {'id':row[0], 'name':row[1]} for row in rows ]
+    #print(rows)
+    rows = [ {'team_name':row[0]} for row in rows ]
     return rows
 
 
 def get_players(team_name=None):
     cursor = connection.cursor()
     if team_name == None:
-        rows = cursor.execute("""select player_name,player_id from player""").fetchall()
+        rows = cursor.execute("""select distinct player_name from player""").fetchall()
     else:
         query = f"SELECT team_id FROM team WHERE team_name ='{team_name}'"
         result = cursor.execute(query).fetchone()
         id=int(result[0])
-        query = f"SELECT player_name,player_id FROM player WHERE team_id = ({id})"
+        query = f"SELECT distinct player_name FROM player WHERE team_id = ({id})"
         rows = cursor.execute(query).fetchall()
     
 
     rows = list(rows)
-    print(rows)
-    rows = [ {'player_name':row[0],'player_id':row[1]} for row in rows ]
+    print (rows)
+    rows = [ {'player_name':row[0]} for row in rows ]
     return rows
+
+def add_player(player_name,team_name):
+    cursor = connection.cursor()
+    print(player_name,team_name)
+    try:
+        team_name=team_name.upper()
+        print("team_name",team_name)
+        query = f"SELECT COUNT(*) FROM team WHERE UPPER(team_name) = UPPER('{team_name}')"
+        result = cursor.execute(query).fetchone()
+        id_count = int(result[0])
+        print("Count:", id_count)
+        team_id=0
+        if result is not None:
+            team_id = int(result[0])
+        print("team_id",team_id)
+        if team_id != 0:
+            query = f"SELECT max(team_id) FROM team"
+            result = cursor.execute(query).fetchone()
+            team_id=int(result[0])       
+            print("id",id)
+            max_team_id=team_id+1
+            print("max team id",max_team_id)
+            cursor.execute("INSERT INTO team (team_id, team_name) VALUES (?, ?)", (max_team_id, team_name))
+            cursor.execute("INSERT INTO player (player_name, team_id) VALUES (?, ?)", (player_name, max_team_id))
+            connection.commit()
+        else:
+            pass
+       
+    except Exception as e:
+        pass
+         
+        
+
 
 def setup_database():
     cursor = connection.cursor()

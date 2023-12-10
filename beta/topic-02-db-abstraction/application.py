@@ -1,6 +1,8 @@
-from bottle import route, post, run, template, redirect, request
+from bottle import route, post, run, template, redirect, request, debug
 
 import database
+
+debug(True)
 
 @route("/")
 def get_index():
@@ -17,8 +19,11 @@ def get_add():
 
 @post("/add")
 def post_add():
-    description = request.forms.get("description")
-    database.add_item(description)
+    player_name = request.forms.get("player_name")
+    team_name = request.forms.get("team_name")
+    print(player_name)
+    print(team_name)
+    database.add_player(player_name,team_name)
     redirect("/list")
 
 @route("/delete/<id>")
@@ -41,4 +46,17 @@ def post_update():
     database.update_item(id, description)
     redirect("/list")
 
-run(host='localhost', port=8080)
+@post("/fetch_teams")
+def get_teams():
+    player_name = request.forms.get("player_name")
+    rows=database.get_teams(player_name)
+    return template("team_view.tpl", team_list=rows)
+
+@post("/fetch_players")
+def get_players():
+    team_name = request.forms.get("team_name")
+    rows=database.get_players(team_name)
+    return template("player_view.tpl", players_list=rows)
+
+
+run(host='localhost', port=8081)
