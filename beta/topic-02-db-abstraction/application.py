@@ -8,8 +8,8 @@ def get_index():
 
 @route("/list")
 def get_list():
-    rows = database.get_items()
-    return template("list.tpl", shopping_list=rows)
+    rows = database.get_players()
+    return template("list.tpl", players_list=rows)
 
 @route("/add")
 def get_add():

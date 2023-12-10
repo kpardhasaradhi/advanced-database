@@ -1,17 +1,17 @@
 <html>
 <body>
-<h2>Shopping List</h2>
+<h2>Players List</h2>
 <hr/>
 <table>
-% for item in shopping_list:
+% for player in players_list:
   <tr>
-    <td>{{item['description']}}</td>
-    <td><a href="/update/{{str(item['id'])}}">update</a></td>
-    <td><a href="/delete/{{str(item['id'])}}">delete</a></td>
+    <td><a href="/fetch_teams/{{player['player_name']}}">{{player['player_name']}}</td>
+    <td><a href="/update/{{str(player['player_id'])}}">update</a></td>
+    <td><a href="/delete/{{str(player['player_id'])}}">delete</a></td>
   </tr>
 % end
 </table>
 <hr/>
-<a href="/add">Add new item</a>
+<a href="/add">Add new player</a>
 </body>
 </html>
