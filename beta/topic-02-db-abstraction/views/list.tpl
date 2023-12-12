@@ -1,6 +1,12 @@
 <html>
 <body>
   <h2>Players List</h2>
+  
+  <hr/>
+  <form id="searchPlayerForm" action="/search" method="post" oninput="enableSubmit()">
+    <p>Search for a player: <input id="player" name="player" required/></p>
+    <p><button id="submit_button" type="submit" disabled>Search</button></p>
+  </form>
   <hr/>
   <form id="fetchTeamsForm" action="/fetch_teams" method="post">
     <table>
@@ -11,6 +17,8 @@
             {{player['player_name']}}
           </a>
         </td>
+        <td><a href="/update/{{str(player['player_name'])}}">update</a></td>
+        <td><a href="/delete/{{str(player['player_name'])}}">delete</a></td>
       </tr>
     % end
     </table>
@@ -27,6 +35,17 @@
       $('#player_name').val(playerName);
       // Submit the form
       $('#fetchTeamsForm').submit();
+    }
+  </script>
+
+   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+    function enableSubmit() {
+      var playerInput = document.getElementById("player");
+      var submitButton = document.getElementById("submit_button");
+
+      // Enable the submit button if player name is entered
+      submitButton.disabled = !(playerInput.value);
     }
   </script>
 </body>

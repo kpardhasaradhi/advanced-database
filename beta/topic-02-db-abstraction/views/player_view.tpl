@@ -1,6 +1,6 @@
 <html>
 <body>
-  <h2>Players List</h2>
+  <h2>Player(s) List</h2>
   <hr/>
   <form id="fetchTeamsForm" action="/fetch_teams" method="post">
     <table>
@@ -11,6 +11,8 @@
             {{player['player_name']}}
           </a>
         </td>
+        <td><a href="/update/{{str(player['player_name'])}}">update</a></td>
+        <td><a href="/delete/{{str(player['player_name'])}}">delete</a></td>
       </tr>
     % end
     </table>

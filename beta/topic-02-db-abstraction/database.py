@@ -1,4 +1,5 @@
 import sqlite3
+import traceback
 
 connection = sqlite3.connect("Ipl.db")
 
@@ -25,8 +26,19 @@ def get_teams(player_name):
     rows = [ {'team_name':row[0]} for row in rows ]
     return rows
 
+def search_player(name):
+    cursor = connection.cursor()
+    rows = cursor.execute(f"select player_name from player where player_name='{name}'").fetchone()
+    if rows is not None:
+        rows = list(rows)
+        print ("search_player: ",rows)
+        rows = [ {'player_name':row} for row in rows ]
+    else:
+        rows = "None"
+    return rows
 
 def get_players(team_name=None):
+    
     cursor = connection.cursor()
     if team_name == None:
         rows = cursor.execute("""select distinct player_name from player""").fetchall()
@@ -51,13 +63,24 @@ def add_player(player_name,team_name):
         print("team_name",team_name)
         query = f"SELECT COUNT(*) FROM team WHERE UPPER(team_name) = UPPER('{team_name}')"
         result = cursor.execute(query).fetchone()
-        id_count = int(result[0])
-        print("Count:", id_count)
-        team_id=0
+        #cursor.execute("Delete from player where player_name in ('Srinu','Pardhu','Jaddu')")
+        count=0
         if result is not None:
-            team_id = int(result[0])
-        print("team_id",team_id)
-        if team_id != 0:
+            count = int(result[0])
+        print("count",count)
+        #Insert a new record only in the Player table if the team exists
+        if count > 0:
+            print("inside if")
+            query = f"SELECT team_id FROM team WHERE UPPER(team_name) = UPPER('{team_name}')"
+            result = cursor.execute(query).fetchone()
+            print("after execution")
+            team_id=int(result[0])    
+            print("team_id ",team_id," Player",player_name)   
+            #cursor.execute("INSERT INTO team (team_id, team_name) VALUES (?, ?)", (max_team_id, team_name))
+            cursor.execute("INSERT INTO player (player_name, team_id) VALUES (?, ?)", (player_name, team_id))
+            connection.commit()
+        #Else insert a record into both Player and team table if the team doesn't exist. 
+        else:
             query = f"SELECT max(team_id) FROM team"
             result = cursor.execute(query).fetchone()
             team_id=int(result[0])       
@@ -67,15 +90,11 @@ def add_player(player_name,team_name):
             cursor.execute("INSERT INTO team (team_id, team_name) VALUES (?, ?)", (max_team_id, team_name))
             cursor.execute("INSERT INTO player (player_name, team_id) VALUES (?, ?)", (player_name, max_team_id))
             connection.commit()
-        else:
-            pass
        
     except Exception as e:
-        pass
+         print(f"Exception: {e}")
+         traceback.print_exc()
          
-        
-
-
 def setup_database():
     cursor = connection.cursor()
     try:
@@ -92,12 +111,12 @@ def setup_database():
     cursor.execute(f"insert into player (player_name,team_id) values ('Virat Kohli','2')")
     cursor.execute(f"insert into player (player_name,team_id) values ('MS Dhoni','1')")
     cursor.execute(f"insert into player (player_name,team_id) values ('MS Dhoni','3')")
-    cursor.execute(f"insert into player (player_name,team_id) values ('rahul','1')")
-    cursor.execute(f"insert into player (player_name,team_id) values ('rahul','2')")
+    cursor.execute(f"insert into player (player_name,team_id) values ('Rahul','1')")
+    cursor.execute(f"insert into player (player_name,team_id) values ('Rahul','2')")
 
     connection.commit()
 
-    cursor.execute("INSERT INTO team (team_id, team_name) VALUES (1, 'India')")
+    cursor.execute("INSERT INTO team (team_id, team_name) VALUES (1, 'INDIA')")
     cursor.execute("INSERT INTO team (team_id, team_name) VALUES (2, 'RCB')")
     cursor.execute("INSERT INTO team (team_id, team_name) VALUES (3, 'CSK')")
     connection.commit()
@@ -122,36 +141,42 @@ def delete_item(id):
 
 def update_item(id, description):
     cursor = connection.cursor()
-    cursor.execute(f"update student set name='{description}' where id={id}")
+    cursor.execute(f"update player set player_name='{description}' where id={id}")
     connection.commit()
 
-def test_get_items():
-    print("testing get_items()")
-    items = get_teams()
-    assert type(items) is list
-    assert len(items) > 0
-    for item in items:
-        assert 'id' in item
-        assert type(item['id']) is int
-        assert 'description' in item
-        assert type(item['description']) is str
-    example_id = items[0]['id']
-    example_description = items[0]['description']
-    items = get_teams(example_id)
-    assert len(items) == 1
-    assert example_id == items[0]['id']
-    assert example_description == items[0]['description']
+def update_player(old_name,new_name):
+    cursor = connection.cursor()
+    print("update_player: ",old_name," NN ",new_name)
+    cursor.execute(f"update player set player_name='{new_name}' where player_name='{old_name}'")
+    #rows = cursor.execute("""select distinct player_name from player""").fetchall()
+    #print(list(rows))
+    connection.commit()
+
+def delete_player(name):
+    cursor = connection.cursor()
+    print(name)
+    cursor.execute(f"delete from player where player_name='{name}'")
+    connection.commit()
 
 def test_setup_database():
     print("testing setup_database()")
     setup_database()
     #items = get_teams('rahul')
-    items=get_players('India')
-    #print(items)
-    #assert len(items) == 5
-    #descriptions = [item['description'] for item in items]
-    #for description in ['apples', 'broccoli', 'pizza', 'tangerines', 'potatoes']:
-    #    assert description in descriptions
+    items=get_players()
+    #search_player('MS Dhoni')
+    #items=add_player('Srinu','INVINCIBLES')
+    #items=update_player('rahul','Rahul')
+    delete_player('Chase master Kohli ')
+    #test_method()
+    print(items)
+    #assert len(items) == 5    #descriptions = [item['description'] for item in items]    #for description in ['apples', 'broccoli', 'pizza', 'tangerines', 'potatoes']:    #    assert description in descriptions
+
+def test_method(team_name='INDIA'):
+    cursor=connection.cursor()
+    query = f"SELECT team_id FROM team WHERE UPPER(team_name) = UPPER('{team_name}'"
+    result = cursor.execute(query).fetchone()
+    team_id=int(result[0])       
+    print("team id:",team_id)
 """
 def test_add_item():
     print("testing add_item()")
