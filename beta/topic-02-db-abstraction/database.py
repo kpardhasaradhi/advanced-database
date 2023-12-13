@@ -129,21 +129,6 @@ def setup_database():
 
     connection.commit()
 
-def add_item(student_name):
-    cursor = connection.cursor()
-    cursor.execute(f"insert into student (name) values ('{student_name}')")
-    connection.commit()
-
-def delete_item(id):
-    cursor = connection.cursor()
-    rows = cursor.execute(f"delete from student where id={id}")
-    connection.commit()
-
-def update_item(id, description):
-    cursor = connection.cursor()
-    cursor.execute(f"update player set player_name='{description}' where id={id}")
-    connection.commit()
-
 def update_player(old_name,new_name):
     cursor = connection.cursor()
     print("update_player: ",old_name," NN ",new_name)
@@ -159,17 +144,12 @@ def delete_player(name):
     connection.commit()
 
 def test_setup_database():
-    print("testing setup_database()")
+#  print("testing setup_database()")
     setup_database()
     #items = get_teams('rahul')
-    items=get_players()
-    #search_player('MS Dhoni')
-    #items=add_player('Srinu','INVINCIBLES')
-    #items=update_player('rahul','Rahul')
-    delete_player('Chase master Kohli ')
-    #test_method()
+#    items=get_players()
+ #   delete_player('Chase master Kohli ')
     print(items)
-    #assert len(items) == 5    #descriptions = [item['description'] for item in items]    #for description in ['apples', 'broccoli', 'pizza', 'tangerines', 'potatoes']:    #    assert description in descriptions
 
 def test_method(team_name='INDIA'):
     cursor=connection.cursor()
@@ -177,54 +157,9 @@ def test_method(team_name='INDIA'):
     result = cursor.execute(query).fetchone()
     team_id=int(result[0])       
     print("team id:",team_id)
-"""
-def test_add_item():
-    print("testing add_item()")
-    setup_database()
-    items = get_items()
-    original_length = len(items)
-    add_item("licorice")
-    items = get_items()
-    assert len(items) == original_length + 1
-    descriptions = [item['description'] for item in items]
-    assert "licorice" in descriptions
-"""
 
-"""
-def test_delete_item():
-    print("testing delete_item()")
-    setup_database()
-    items = get_items()
-    original_length = len(items)
-    deleted_description = items[1]['description']
-    deleted_id = items[1]['id']
-    delete_item(deleted_id)
-    items = get_items()
-    assert len(items) == original_length - 1
-    for item in items:
-        assert item['id'] != deleted_id
-        assert item['description'] != deleted_description
-"""
-"""
-def test_update_item():
-    print("testing update_item()")
-    setup_database()
-    items = get_items()
-    original_description = items[1]['description']
-    original_id = items[1]['id']
-    update_item(original_id,"new-description")
-    items = get_items()
-    found = False
-    for item in items:
-        if item['id'] == original_id:
-            assert item['description'] == "new-description"
-            found = True
-    assert found
-"""
+
 if __name__ == "__main__":
-   # test_get_items()
     test_setup_database()
- #   test_add_item()
-  #  test_delete_item()
-   # test_update_item()
-    #print("done.")
+   
+

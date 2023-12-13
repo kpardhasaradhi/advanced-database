@@ -15,7 +15,7 @@ def get_list():
 
 @route("/add")
 def get_add():
-    return template("add_item.tpl")
+    return template("add_player.tpl")
 
 @post("/add")
 def post_add():
@@ -35,21 +35,6 @@ def get_delete(id):
 def get_delete(name):
     print("/delete ",name)
     database.delete_player(name)
-    redirect("/list")
-
-@route("/update/<id>")
-def get_update(id):
-    rows = database.get_items(id)
-    if len(rows) != 1:
-        redirect("/list")
-    description = rows[0]['description']
-    return template("update_item.tpl", id=id, description=description)
-
-@post("/update")
-def post_update():
-    description = request.forms.get("description")
-    id = request.forms.get("id")
-    database.update_item(id, description)
     redirect("/list")
 
 
